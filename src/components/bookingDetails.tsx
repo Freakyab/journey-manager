@@ -1,7 +1,9 @@
+import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 function BookingsView() {
-
+  // loading
+  const [isLoading, setIsLoading] = useState(true);
   // State to store the bookings data
   const [bookingsData, setBookingsData] = useState<
     {
@@ -18,6 +20,7 @@ function BookingsView() {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
+        setIsLoading(true);
         const res = await fetch("https://journey-manager-backend.vercel.app/bookings");
         if (res.ok) {
           const data = await res.json();
@@ -29,6 +32,7 @@ function BookingsView() {
       } catch (error) {
         console.error("Failed to fetch bookings:", error);
       }
+      setIsLoading(false);
     };
 
     fetchBookings();
@@ -41,7 +45,7 @@ function BookingsView() {
           <h2 className="text-2xl sm:text-3xl font-bold text-center text-third mb-6">
             Submitted Bookings
           </h2>
-
+          {isLoading && <Loader2 className="text-third mx-auto animate-spin" size="64" />}
           {bookingsData.length === 0 ? (
             <div className="text-center text-gray-500 text-base sm:text-lg">
               No bookings found.

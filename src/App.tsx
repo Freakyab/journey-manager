@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PackageType from "./type";
 import { fetchPackages } from "./action";
+import { Loader2 } from "lucide-react";
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
   const [filterData, setFilterData] = useState<PackageType[] | []>();
   const [fetchData, setFetchData] = useState<PackageType[] | []>();
   const [searchTerm, setSearchTerm] = useState("");
@@ -11,9 +13,11 @@ function App() {
 
   useEffect(() => {
     const fetchAPI = async () => {
+      setIsLoading(true);
       const data = await fetchPackages();
       setFetchData(data);
       setFilterData(data);
+      setIsLoading(false);
     };
 
     fetchAPI();
@@ -44,6 +48,7 @@ function App() {
           Top Visited Places
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          {isLoading && <Loader2 className="text-third mx-auto animate-spin" size="64" />}
           {fetchData?.map((item, index) => (
             <div
               key={index}
@@ -117,6 +122,7 @@ function App() {
         {/* Retro Styled Search Results */}
         <div className="bg-secondary/20 my-6 sm:my-12 py-8 sm:py-12 px-2 sm:px-4 rounded-lg">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
+          {isLoading && <Loader2 className="text-third mx-auto animate-spin" size="64" />}
             {filterData?.map((item, index) => (
               <div
                 key={index}

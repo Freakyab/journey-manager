@@ -1,4 +1,4 @@
-import { Trash2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import AddBookingForm from "./addPackageForm";
 import BookingsView from "./bookingDetails";
@@ -9,6 +9,9 @@ import PackageType from "../type";
 function Admin() {
   // add package modal state
   const [isAddPackageModalOpen, setIsAddPackageModalOpen] = useState(false);
+
+  // loading state
+  const [isLoading, setIsLoading] = useState(true);
 
   // package details state for editing
   const [packageDetails, setPackageDetails] = useState<PackageType | null>(
@@ -21,8 +24,10 @@ function Admin() {
   useEffect(() => {
     // fetch all packages
     const fetchAPI = async () => {
+      setIsLoading(true);
       const data = await fetchPackages();
       setPackages(data);
+      setIsLoading(false);
     };
 
     fetchAPI();
@@ -78,6 +83,7 @@ function Admin() {
         <h2 className="text-3xl font-bold text-third mb-6 text-center">
           Admin page
         </h2>
+        {isLoading && <Loader2 className="text-third w-full text-center animate-spin" size="64" />}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {packages?.map((item, index) => (
             <div
