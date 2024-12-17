@@ -15,7 +15,7 @@ function BookingsView() {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const res = await fetch("http://localhost:8000/bookings");
+        const res = await fetch("https://journey-manager-backend.vercel.app/bookings");
         if (res.ok) {
           const data = await res.json();
           setBookingsData(data.bookings);

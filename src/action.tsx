@@ -1,6 +1,6 @@
 export const fetchPackages = async () => {
   try {
-    const response = await fetch("http://localhost:8000/packages", {
+    const response = await fetch("https://journey-manager-backend.vercel.app/packages", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -28,7 +28,7 @@ export const fetchPackages = async () => {
 
 export const fetchPackageById = async (id: string) => {
   try {
-    const response = await fetch(`http://localhost:8000/packages/${id}`, {
+    const response = await fetch(`https://journey-manager-backend.vercel.app/packages/${id}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -64,7 +64,7 @@ export const addPackage = async (formData: {
   image: string;
 }) => {
   try {
-    await fetch("http://localhost:8000/admin/add", {
+    await fetch("https://journey-manager-backend.vercel.app/admin/add", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -105,7 +105,7 @@ export const generateBooking = async (bookingData: {
   }
 
   try {
-    const res = await fetch("http://localhost:8000/bookings/add", {
+    const res = await fetch("https://journey-manager-backend.vercel.app/bookings/add", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -142,7 +142,7 @@ export const updatePackage = async (formData: {
 }) => {
   try {
     const response = await fetch(
-      `http://localhost:8000/admin/update/${formData._id}`,
+      `https://journey-manager-backend.vercel.app/admin/update/${formData._id}`,
       {
         method: "PUT",
         headers: {
@@ -173,7 +173,7 @@ export const updatePackage = async (formData: {
 
 export const deletePackage = async (id: string) => {
   try {
-    const response = await fetch(`http://localhost:8000/admin/delete/${id}`, {
+    const response = await fetch(`https://journey-manager-backend.vercel.app/admin/delete/${id}`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
