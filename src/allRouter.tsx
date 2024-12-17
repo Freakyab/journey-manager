@@ -7,8 +7,8 @@ const AllRouter = () => {
     <BrowserRouter>
     <Routes>
       <Route path="/" element={<App />} />
-      <Route path="admin" element={<Admin />} />
-      <Route path="package/:id" element={<Package />}>
+      <Route path="/admin" element={<Admin />} />
+      <Route path="/package/:id" element={<Package />}>
       </Route>
     </Routes>
   </BrowserRouter>
