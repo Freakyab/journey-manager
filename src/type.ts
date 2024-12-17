@@ -9,7 +9,7 @@
 // },
 
 type PackageType = {
-    id: number;
+    _id: any;
     title: string;
     description: string;
     price: number;

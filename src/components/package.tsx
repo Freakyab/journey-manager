@@ -1,13 +1,25 @@
-import { useState } from "react";
-import dummyData from "./dummyData";
+import { useEffect, useState } from "react";
 import BookingForm from "./bookingForm";
 import { useParams } from "react-router-dom";
+import PackageType from "../type";
+import { fetchPackageById } from "../action";
 
 function Package() {
   // Get the package ID from the URL
   const { id } = useParams<{ id: string }>();
-  const packageData = dummyData.find((data) => data.id === Number(id));
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [packageData, setPackageData] = useState<PackageType | null>(null);
+
+  useEffect(() => {
+    if (!id) return;
+    const fetchAPI = async () => {
+      const data = await fetchPackageById(id);
+      setPackageData(data);
+    };
+
+    fetchAPI();
+  }, [id]);
+
   return (
     <div className="bg-primary/20 min-h-screen min-w-screen flex justify-center items-center p-8">
       {packageData && (
@@ -114,8 +126,9 @@ function Package() {
               </div>
             </div>
 
-            {isBookingModalOpen && (
+            {isBookingModalOpen && id && (
               <BookingForm
+                packageId={id}
                 packageDetails={packageData}
                 onClose={() => setIsBookingModalOpen(false)}
               />

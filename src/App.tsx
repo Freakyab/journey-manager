@@ -1,39 +1,31 @@
 import { useEffect, useState } from "react";
-import dummyData from "./components/dummyData";
 import { useNavigate } from "react-router-dom";
+import PackageType from "./type";
+import { fetchPackages } from "./action";
 
 function App() {
-  const [filterData, setFilterData] = useState(dummyData);
+  const [filterData, setFilterData] = useState<PackageType[] | []>();
+  const [fetchData, setFetchData] = useState<PackageType[] | []>();
   const [searchTerm, setSearchTerm] = useState("");
   const navigater = useNavigate();
 
-  // useEffect(() => {
-  //   if (searchTerm === "") {
-  //     setFilterData(dummyData);
-  //   } else {
-  //     setFilterData(
-  //       dummyData.filter(
-  //         (item) =>
-  //           item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  //           item.location.toLowerCase().includes(searchTerm.toLowerCase())
-  //       )
-  //     );
-  //   }
-  // }, [searchTerm]);
+  useEffect(() => {
+    const fetchAPI = async () => {
+      const data = await fetchPackages();
+      console.log(data);
+      setFetchData(data);
+      setFilterData(data);
+    };
+
+    fetchAPI();
+  }, []);
 
   const handleSearch = () => {
-    if (searchTerm === "") {
-      setFilterData(dummyData);
-    } else {
-      setFilterData(
-        dummyData.filter(
-          (item) =>
-            item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.location.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      );
-    }
-  }
+    const filteredData = fetchData?.filter((item) =>
+      item.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    setFilterData(filteredData);
+  };
 
   return (
     <div className="bg-primary min-h-screen w-full p-4 sm:p-6">
@@ -53,7 +45,7 @@ function App() {
           Top Visited Places
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {dummyData.map((item, index) => (
+          {fetchData?.map((item, index) => (
             <div
               key={index}
               className={`bg-white border-2 border-secondary rounded-lg shadow-lg overflow-hidden group relative transition-transform duration-300 
@@ -75,12 +67,12 @@ function App() {
                   {item.description}
                 </p>
                 <div className="mt-2 sm:mt-4 flex gap-2 sm:gap-4">
-                  <button className="bg-third text-white py-1 px-2 sm:py-2 sm:px-4 rounded-md text-sm sm:text-base hover:bg-fourth transition duration-200">
+                  {/* <button className="bg-third text-white py-1 px-2 sm:py-2 sm:px-4 rounded-md text-sm sm:text-base hover:bg-fourth transition duration-200">
                     Book Now
-                  </button>
+                  </button> */}
                   <button
                     className="bg-fourth text-white py-1 px-2 sm:py-2 sm:px-4 rounded-md text-sm sm:text-base hover:bg-third transition duration-200"
-                    onClick={() => navigater(`/package/${item.id}`)}>
+                    onClick={() => navigater(`/package/${item._id}`)}>
                     Know More
                   </button>
                 </div>
@@ -126,7 +118,7 @@ function App() {
         {/* Retro Styled Search Results */}
         <div className="bg-secondary/20 my-6 sm:my-12 py-8 sm:py-12 px-2 sm:px-4 rounded-lg">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8">
-            {filterData.map((item, index) => (
+            {filterData?.map((item, index) => (
               <div
                 key={index}
                 className="relative transform transition-all duration-300 
@@ -212,7 +204,7 @@ function App() {
                         </span>
                       </div>
                       <button
-                        onClick={() => navigater(`/package/${item.id}`)}
+                        onClick={() => navigater(`/package/${item._id}`)}
                         className="bg-third text-primary 
                         px-4 py-2 sm:px-6 sm:py-2 rounded-full font-bold text-sm sm:text-base
                         hover:bg-fourth transition duration-300 

@@ -1,8 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { addPackage, updatePackage } from "../action";
+import PackageType from "../type";
 
-function AddBookingForm({ onClose }: { onClose: () => void }) {
+function AddBookingForm({
+  packageDetails,
+  onClose,
+}: {
+  packageDetails?: PackageType;
+  onClose: () => void;
+}) {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -13,6 +21,19 @@ function AddBookingForm({ onClose }: { onClose: () => void }) {
   });
 
   const [currentDate, setCurrentDate] = useState<string>("");
+
+  useEffect(() => {
+    if (packageDetails) {
+      setFormData({
+        title: packageDetails.title,
+        description: packageDetails.description,
+        price: packageDetails.price,
+        location: packageDetails.location,
+        availableDates: packageDetails.availableDates,
+        image: packageDetails.image,
+      });
+    }
+  }, [packageDetails]);
 
   useEffect(() => {
     // Listen for the escape key to close the form
@@ -64,22 +85,135 @@ function AddBookingForm({ onClose }: { onClose: () => void }) {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      console.log("Submitted form data:", formData);
-      toast.success("Package created successfully!");
-      onClose(); // Close the modal
+      if (
+        !formData.title ||
+        !formData.description ||
+        !formData.price ||
+        !formData.location ||
+        !formData.image ||
+        formData.availableDates.length === 0
+      ) {
+        toast.error("Please fill all fields.");
+        return;
+      }
+
+      if (formData.price < 0) {
+        toast.error("Price cannot be negative.");
+        return;
+      }
+
+      // Check if the date is in the past
+      const currentDate = new Date().toISOString().split("T")[0];
+      if (formData.availableDates.some((date) => date < currentDate)) {
+        toast.error("Date cannot be in the past.");
+        return;
+      }
+
+      // Send the data to the server
+      await addPackage(formData).then((failed) => {
+        if (failed) {
+          throw new Error("Failed to create package.");
+        } else {
+          toast.success("Package created successfully!");
+        }
+      });
     } catch (error) {
       toast.error("Error submitting the package. Please try again.");
       console.error("Submission error:", error);
     }
+    setFormData({
+      title: "",
+      description: "",
+      price: 0,
+      location: "",
+      availableDates: [],
+      image: "",
+    });
+    onClose(); // Close the modal
+  };
+
+  const updatePackageDetails = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    try {
+      if (!packageDetails?._id) {
+        toast.error("Package ID not found");
+        return;
+      }
+
+      const newFormData = {
+        ...formData,
+        _id: packageDetails?._id,
+      };
+
+      if (
+        newFormData.title === "" ||
+        newFormData.description === "" ||
+        newFormData.price === 0 ||
+        newFormData.location === "" ||
+        newFormData.image === "" ||
+        newFormData.availableDates.length === 0
+      ) {
+        toast.error("Please fill all the fields");
+        return;
+      }
+
+      if (
+        newFormData.title === packageDetails.title &&
+        newFormData.description === packageDetails.description &&
+        newFormData.price === packageDetails.price &&
+        newFormData.location === packageDetails.location &&
+        newFormData.image === packageDetails.image &&
+        newFormData.availableDates.join(",") ===
+          packageDetails.availableDates.join(",")
+      ) {
+        toast.error("No changes detected");
+        return;
+      }
+
+      if (newFormData.price < 0) {
+        toast.error("Price cannot be negative");
+        return;
+      }
+
+      // Check if the date is in the past
+      const currentDate = new Date().toISOString().split("T")[0];
+      if (newFormData.availableDates.some((date) => date < currentDate)) {
+        toast.error("Date cannot be in the past");
+        return;
+      }
+
+      // Send the data to the server
+      const response = await updatePackage(newFormData);
+      if (response.success) {
+        toast.success("Package updated successfully!");
+      } else {
+        toast.error(response.message);
+        console.error("Update error:", response);
+      }
+    } catch (error) {
+      toast.error("Error updating the package. Please try again.");
+      console.error("Update error:", error);
+    }
+    setFormData({
+      title: "",
+      description: "",
+      price: 0,
+      location: "",
+      availableDates: [],
+      image: "",
+    });
+    onClose(); // Close the modal
   };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-primary/90 rounded-xl shadow-2xl w-full max-w-xl p-8 max-h-[90vh] overflow-y-auto">
         <h2 className="text-3xl font-bold text-third mb-6 text-center">
-          Create a New Package
+          {packageDetails?._id ? "Edit Package" : "Create a New Package"}
         </h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form
+          onSubmit={packageDetails?._id ? updatePackageDetails : handleSubmit}
+          className="space-y-4">
           {/* Title */}
           <div>
             <label className="block text-third font-semibold mb-2">
@@ -108,8 +242,7 @@ function AddBookingForm({ onClose }: { onClose: () => void }) {
               required
               rows={3}
               className="w-full p-3 border-2 border-third/30 rounded-lg focus:outline-none focus:ring-2 focus:ring-fourth"
-              placeholder="Enter package description"
-            ></textarea>
+              placeholder="Enter package description"></textarea>
           </div>
 
           {/* Price */}
@@ -173,8 +306,7 @@ function AddBookingForm({ onClose }: { onClose: () => void }) {
               <button
                 type="button"
                 onClick={handleAddDate}
-                className="bg-fourth text-primary px-4 py-2 rounded-full font-bold hover:bg-third/90 transition duration-300"
-              >
+                className="bg-fourth text-primary px-4 py-2 rounded-full font-bold hover:bg-third/90 transition duration-300">
                 Add Date
               </button>
             </div>
@@ -184,14 +316,12 @@ function AddBookingForm({ onClose }: { onClose: () => void }) {
               {formData.availableDates.map((date, index) => (
                 <div
                   key={index}
-                  className="flex items-center gap-2 bg-third/20 text-third px-3 py-1 rounded-full"
-                >
+                  className="flex items-center gap-2 bg-third/20 text-third px-3 py-1 rounded-full">
                   <span>{date}</span>
                   <button
                     type="button"
                     onClick={() => handleRemoveDate(date)}
-                    className="text-red-500 hover:text-red-700"
-                  >
+                    className="text-red-500 hover:text-red-700">
                     &times;
                   </button>
                 </div>
@@ -204,14 +334,12 @@ function AddBookingForm({ onClose }: { onClose: () => void }) {
             <button
               type="button"
               onClick={onClose}
-              className="bg-third/20 text-third px-6 py-3 rounded-full hover:bg-third/30 transition duration-300"
-            >
+              className="bg-third/20 text-third px-6 py-3 rounded-full hover:bg-third/30 transition duration-300">
               Cancel
             </button>
             <button
               type="submit"
-              className="bg-third text-primary px-8 py-3 rounded-full hover:bg-fourth transition duration-300"
-            >
+              className="bg-third text-primary px-8 py-3 rounded-full hover:bg-fourth transition duration-300">
               Confirm Package
             </button>
           </div>

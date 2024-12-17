@@ -1,14 +1,47 @@
 import { Trash2 } from "lucide-react";
-import dummyData from "./dummyData";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AddBookingForm from "./addPackageForm";
 import BookingsView from "./bookingDetails";
+import { deletePackage, fetchPackages } from "../action";
+import PackageType from "../type";
 
 function Admin() {
   const [isAddPackageModalOpen, setIsAddPackageModalOpen] = useState(false);
+  const [packageDetails, setPackageDetails] = useState<PackageType | null>(
+    null
+  );
+  const [packages, setPackages] = useState<PackageType[]>([]);
+
+  useEffect(() => {
+    const fetchAPI = async () => {
+      const data = await fetchPackages();
+      setPackages(data);
+    };
+
+    fetchAPI();
+  }, [isAddPackageModalOpen]);
 
   const handleAddPackage = () => {
     setIsAddPackageModalOpen(true);
+  };
+
+  const handleDeletePackage = async (id: string) => {
+    try {
+      const confirmDelete = window.confirm(
+        "Are you sure you want to delete this package?"
+      );
+      if (!confirmDelete) {
+        return;
+      }
+      const response = await deletePackage(id);
+
+      if (response.success) {
+        const data = await fetchPackages();
+        setPackages(data);
+      }
+    } catch (error) {
+      console.error("Error deleting package:", error);
+    }
   };
 
   return (
@@ -25,7 +58,10 @@ function Admin() {
         </button>
       </div>
       {isAddPackageModalOpen && (
-        <AddBookingForm onClose={() => setIsAddPackageModalOpen(false)} />
+        <AddBookingForm
+          packageDetails={packageDetails || undefined}
+          onClose={() => setIsAddPackageModalOpen(false)}
+        />
       )}
 
       {/* Main Content */}
@@ -34,7 +70,7 @@ function Admin() {
           Admin page
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {dummyData.map((item, index) => (
+          {packages?.map((item, index) => (
             <div
               key={index}
               className="relative transform transition-all duration-300 
@@ -43,7 +79,9 @@ function Admin() {
                 className="bg-primary/90 rounded-xl overflow-hidden 
                 border-4 border-third shadow-lg relative">
                 {/* Delete Button */}
-                <div className="absolute top-4 right-4 z-10 flex gap-4">
+                <div
+                  className="absolute top-4 right-4 z-10 flex gap-4"
+                  onClick={() => handleDeletePackage(item._id)}>
                   <button className="border-secondary border-2 bg-fourth/70 text-secondary rounded-full p-2 hover:bg-fourth hover:shadow-md transition">
                     <Trash2 size={24} />
                   </button>
@@ -113,7 +151,11 @@ function Admin() {
                       className="bg-third text-primary 
                       px-6 py-2 rounded-full font-bold 
                       hover:bg-fourth transition duration-300 
-                      transform hover:scale-105">
+                      transform hover:scale-105"
+                      onClick={() => {
+                        setPackageDetails(item);
+                        setIsAddPackageModalOpen(true);
+                      }}>
                       Edit
                     </button>
                   </div>
