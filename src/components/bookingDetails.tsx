@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 
 function BookingsView() {
+
+  // State to store the bookings data
   const [bookingsData, setBookingsData] = useState<
     {
       _id: string;
@@ -12,6 +14,7 @@ function BookingsView() {
     }[]
   >([]);
 
+  // Fetch bookings data from the backend
   useEffect(() => {
     const fetchBookings = async () => {
       try {

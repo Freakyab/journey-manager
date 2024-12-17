@@ -12,7 +12,6 @@ function App() {
   useEffect(() => {
     const fetchAPI = async () => {
       const data = await fetchPackages();
-      console.log(data);
       setFetchData(data);
       setFilterData(data);
     };

@@ -41,6 +41,7 @@ const BookingReceipt = ({
     ref,
   } = bookingDetails;
 
+  // Generate PDF
   const generatePDF = async () => {
     try {
       const pdfDoc = await PDFDocument.create();

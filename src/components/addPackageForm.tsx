@@ -4,13 +4,16 @@ import "react-toastify/dist/ReactToastify.css";
 import { addPackage, updatePackage } from "../action";
 import PackageType from "../type";
 
-function AddBookingForm({
+// Add booking form component to create booking or edit booking
+function AddPackageForm({
   packageDetails,
   onClose,
 }: {
   packageDetails?: PackageType;
   onClose: () => void;
 }) {
+
+  // Form data state
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -20,8 +23,11 @@ function AddBookingForm({
     image: "",
   });
 
+  // to check the current date
   const [currentDate, setCurrentDate] = useState<string>("");
 
+
+  // Set the form data if packageDetails is provided (for editing)
   useEffect(() => {
     if (packageDetails) {
       setFormData({
@@ -84,7 +90,10 @@ function AddBookingForm({
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     try {
+    
+      // Check if all fields are filled
       if (
         !formData.title ||
         !formData.description ||
@@ -97,6 +106,7 @@ function AddBookingForm({
         return;
       }
 
+      // Check if the price is negative
       if (formData.price < 0) {
         toast.error("Price cannot be negative.");
         return;
@@ -121,6 +131,8 @@ function AddBookingForm({
       toast.error("Error submitting the package. Please try again.");
       console.error("Submission error:", error);
     }
+
+    // Reset the form data and close the modal
     setFormData({
       title: "",
       description: "",
@@ -132,19 +144,24 @@ function AddBookingForm({
     onClose(); // Close the modal
   };
 
+  // Handle updating the package details
   const updatePackageDetails = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
+
+      // Check if the package ID is available
       if (!packageDetails?._id) {
         toast.error("Package ID not found");
         return;
       }
 
+      // Create a new form data object with the package ID
       const newFormData = {
         ...formData,
         _id: packageDetails?._id,
       };
 
+      // Check if all fields are filled
       if (
         newFormData.title === "" ||
         newFormData.description === "" ||
@@ -157,6 +174,7 @@ function AddBookingForm({
         return;
       }
 
+      // Check if there are any changes
       if (
         newFormData.title === packageDetails.title &&
         newFormData.description === packageDetails.description &&
@@ -170,6 +188,7 @@ function AddBookingForm({
         return;
       }
 
+      // Check if the price is negative
       if (newFormData.price < 0) {
         toast.error("Price cannot be negative");
         return;
@@ -194,6 +213,8 @@ function AddBookingForm({
       toast.error("Error updating the package. Please try again.");
       console.error("Update error:", error);
     }
+
+    // Reset the form data and close the modal
     setFormData({
       title: "",
       description: "",
@@ -329,7 +350,7 @@ function AddBookingForm({
             </div>
           </div>
 
-          {/* Buttons */}
+          {/* Confirm Buttons */}
           <div className="flex justify-between mt-6">
             <button
               type="button"
@@ -349,4 +370,4 @@ function AddBookingForm({
   );
 }
 
-export default AddBookingForm;
+export default AddPackageForm;

@@ -6,14 +6,16 @@ import { generateBooking } from "../action";
 import BookingReceipt from "./bookingReceipt";
 
 function BookingForm({
-  packageId,
-  packageDetails,
-  onClose,
+  packageId, // package ID
+  packageDetails, // package details
+  onClose, // close modal function
 }: {
   packageId: string;
   packageDetails: any;
   onClose: () => void;
 }) {
+
+  // Form data state
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -22,6 +24,8 @@ function BookingForm({
     specialRequests: "",
     date: "",
   });
+
+  // Booking details state after successful booking
   const [bookingDetails, setBookingDetails] = useState<{
     packageName: string;
     customerName: string;
@@ -67,6 +71,8 @@ function BookingForm({
     e.preventDefault();
 
     try {
+
+      // check if all fields are filled
       if (
         !formData.name ||
         !formData.email ||
@@ -78,13 +84,15 @@ function BookingForm({
         return;
       }
 
+      // generate booking data
       const bookingData = {
         ...formData,
         packageId: packageId,
       };
 
+      // send booking data to the backend
       const response = await generateBooking(bookingData);
-      console.log(response.data);
+
       if (response.success) {
         toast.success("Booking successful!");
 
@@ -100,7 +108,6 @@ function BookingForm({
           packageDetails: packageDetails.description,
           ref : response.data._id
         });
-        // generatePDF();
       } else {
         toast.error(response.message);
       }
@@ -108,7 +115,6 @@ function BookingForm({
       toast.error("Booking failed. Please try again.");
       console.error("Booking error:", error);
     }
-    // onClose();
   };
 
   return (

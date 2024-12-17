@@ -5,14 +5,21 @@ import BookingsView from "./bookingDetails";
 import { deletePackage, fetchPackages } from "../action";
 import PackageType from "../type";
 
+// Admin Page
 function Admin() {
+  // add package modal state
   const [isAddPackageModalOpen, setIsAddPackageModalOpen] = useState(false);
+
+  // package details state for editing
   const [packageDetails, setPackageDetails] = useState<PackageType | null>(
     null
   );
+
+  // all packages state
   const [packages, setPackages] = useState<PackageType[]>([]);
 
   useEffect(() => {
+    // fetch all packages
     const fetchAPI = async () => {
       const data = await fetchPackages();
       setPackages(data);
@@ -21,10 +28,12 @@ function Admin() {
     fetchAPI();
   }, [isAddPackageModalOpen]);
 
+  // add package button handler
   const handleAddPackage = () => {
     setIsAddPackageModalOpen(true);
   };
 
+  // delete package handler
   const handleDeletePackage = async (id: string) => {
     try {
       const confirmDelete = window.confirm(
@@ -47,7 +56,6 @@ function Admin() {
   return (
     <div className="min-h-screen h-full w-full bg-primary/20 flex flex-col items-center p-8 relative">
       {/* Add New Package Button */}
-
       <div className="w-full flex justify-end mb-8 sticky top-4 z-20">
         <button
           className="bg-gradient-to-br from-fourth to-secondary text-primary 
@@ -57,6 +65,7 @@ function Admin() {
           + Add New Package
         </button>
       </div>
+
       {isAddPackageModalOpen && (
         <AddBookingForm
           packageDetails={packageDetails || undefined}
