@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: #ffbe98;
+  --secondary: #f05a7e;
+  --third: #125b9a;
+  --fourth: #0b8494;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  
+}
